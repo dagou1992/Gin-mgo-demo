@@ -1,46 +1,56 @@
 package handlers
 
 import (
+    "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "../bean"
     "../db"
 )
 
 const (
+    DATABASE = "test"
     COLLECTIONNAME = "user"
 )
 
+func withCollection(f func(*mgo.Collection) error) error {
+    session := db.Connect()
+    defer session.Close()
+    c := session.DB(DATABASE).C(COLLECTIONNAME)
+    return f(c)
+}
+
 func Insert(user bean.User) (err error) {
-    db := db.Connect()
-    err = db.C(COLLECTIONNAME).Insert(&user)
+    err = withCollection(func(c *mgo.Collection) error {
+        return c.Insert(&user)
+    })
     return
 }
 
 func Find(name string) (user []bean.User, err error) {
-    db := db.Connect()
-    client := db.C(COLLECTIONNAME)
-    if name == "" {
-        err = client.Find(bson.M{}).All(&user)
-    } else {
-        var u bean.User
-        err = client.Find(bson.M{"name": name}).One(&u)
-        user = append(user, u)
+    selector := bson.M{}
+    if name != "" {
+        selector = bson.M{"name": name}
     }
+    err = withCollection(func(c *mgo.Collection) error {
+        return c.Find(selector).All(&user)
+    })
     return 
 }
 
 func Update(name string, age string, phone string) (err error) {
-    db := db.Connect()
     data := bson.M{"age": age, "phone": phone}
     selector := bson.M{"name": name}
     updateData := bson.M{"$set": data}
-    err = db.C(COLLECTIONNAME).Update(selector, updateData)
+    err = withCollection(func(c *mgo.Collection) error {
+        return c.Update(selector, updateData)
+    })
     return
 }
 
 func Delete(name string) (err error) {
-    db := db.Connect()
     selector := bson.M{"name": name}
-    err = db.C(COLLECTIONNAME).Remove(selector)
+    err = withCollection(func(c *mgo.Collection) error {
+        return c.Remove(selector)
+    })
     return 
 }

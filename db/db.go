@@ -7,7 +7,11 @@ import (
 	"../bean"
 )
 
-func Connect() (mongo *mgo.Database) {
+var (
+	Session * mgo.Session
+)
+
+func Connect() (session *mgo.Session) {
 	config := bean.Config{}
 	err := gcfg.ReadFileInto(&config, "./config/config.ini")
 	if err != nil {
@@ -17,13 +21,16 @@ func Connect() (mongo *mgo.Database) {
 
 	uri := string(config.MongoDB.Ip) + ":" + string(config.MongoDB.Port)
 
-	session, err := mgo.Dial(uri)
-	fmt.Println("Connected to", uri)
-	if err != nil {
-		fmt.Printf("Mongo connect failed")
-		panic(err.Error())
+	if Session == nil {
+		session, err := mgo.Dial(uri)
+		fmt.Println("Connected to", uri)
+		if err != nil {
+			fmt.Printf("Mongo connect failed")
+			panic(err.Error())
+		}
+		session.SetMode(mgo.Monotonic, true)
+		Session = session
 	}
-	session.SetMode(mgo.Monotonic, true)
-	mongo = session.DB(config.MongoDB.Database)
-	return 
+
+	return Session.Clone()
 }
