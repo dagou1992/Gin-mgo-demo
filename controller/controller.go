@@ -3,8 +3,8 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"../bean"
-	"../handlers"
+	"bean"
+	"handlers"
 )
 
 type option struct {

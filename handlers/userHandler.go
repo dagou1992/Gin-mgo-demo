@@ -3,8 +3,8 @@ package handlers
 import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
-    "../bean"
-    "../db"
+    "bean"
+    "db"
 )
 
 const (

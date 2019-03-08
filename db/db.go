@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/gcfg.v1"
-	"../bean"
+	"bean"
 )
 
 var (

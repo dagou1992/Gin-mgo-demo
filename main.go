@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/gcfg.v1"
 	"strconv"
-	"./router"
-	"./bean"
+	"router"
+	"bean"
 )
 
 func main() {
